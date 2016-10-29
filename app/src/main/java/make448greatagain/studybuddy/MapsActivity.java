@@ -120,11 +120,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
+    Marker mCurrentLocationMarker = null;
     @Override
     public void onLocationChanged(Location location) {
         Location mLastLocation = location;
-        Marker mCurrentLocationMarker = null;
+       
         if (mCurrentLocationMarker != null) {
                 mCurrentLocationMarker.remove();
             }
