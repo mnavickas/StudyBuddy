@@ -41,8 +41,9 @@ public class UserManager {
         {
             //TODO actually handle this.
             //for now, force a crash.
-            Object o;
+            Object o = null;
             o.toString();
+            return null;
         }
     }
 }
