@@ -40,5 +40,14 @@
         android:onClick="goToLogin"
         android:id="@+id/button2" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:color/holo_orange_light"
+        android:layout_above="@+id/button2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/imageView" />
+
 
 </RelativeLayout>

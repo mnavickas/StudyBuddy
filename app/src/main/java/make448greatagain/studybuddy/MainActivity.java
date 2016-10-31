@@ -20,8 +20,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-    public void goToLogin(View view) {
-
+    public void goToLogin(View view)
+    {
+        Intent j = new Intent(view.getContext(), LoginActivity.class);
+        startActivityForResult(j, 0);
     }
 
 }
