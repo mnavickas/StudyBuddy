@@ -1,6 +1,9 @@
 package make448greatagain.studybuddy;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -23,21 +26,26 @@ import static java.lang.Boolean.TRUE;
  * Created by Michael on 10/25/2016.
  */
 
-public class DBManager extends AsyncTask<Void, Void, Void>{
+public class DBManager extends AsyncTask<Void, Void, Boolean>{
     public static final int SUCCESS = 0;
     public static final int PASSWORD_ERROR = 2;
     public static final int USERNAME_ERROR = 1;
+    public static final int CONNECTION_ERROR = 3;
 
     final String user;
     final String pass;
+    //final Context context;
     public DBManager(final String user, final String pass)
     {
         this.user = user;
         this.pass = pass;
+       // this.context = context;
     }
 
-    private void postData(URL url, final HttpURLConnection httpcon)
+    private void postData(URL url, final HttpURLConnection httpcon) throws IOException
     {
+
+
         try {
             Log.d("CONNECTION", "Start");
             Log.d("CONNECTION", "URL " + url.toString());
@@ -57,10 +65,10 @@ public class DBManager extends AsyncTask<Void, Void, Void>{
             outputStream.close();
             Log.d("CONNECTION", "Posted Data");
         }catch(IOException e){
-            e.printStackTrace();
+            throw e;
         }
     }
-    protected Void doInBackground(Void... params)
+    protected Boolean doInBackground(Void... params)
     {
         try{
             URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/adduser.php");
@@ -74,16 +82,18 @@ public class DBManager extends AsyncTask<Void, Void, Void>{
             bufferedReader.close();
             inputStream.close();
             httpcon.disconnect();
+            return TRUE;
 
         }catch(IOException e){
             e.printStackTrace();
             Log.d("CONNECTION",e.getMessage());
+            return FALSE;
 
         }
-        return null;
     }
 
-    public Boolean checkUserExist(){
+    public Boolean checkUserExist() throws IOException
+    {
 
         try{
             URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/checkexists.php");
@@ -106,13 +116,12 @@ public class DBManager extends AsyncTask<Void, Void, Void>{
             Log.d("CONNECTION",result);
             return result.equals("Success");
         }catch(IOException e){
-            e.printStackTrace();
-            Log.d("CONNECTION",e.getMessage());
-            return FALSE;
+            throw e;
+           // return FALSE;
         }
     }
 
-    public User tryLogin()
+    public User tryLogin() throws IOException
     {
 
         try{
@@ -143,9 +152,12 @@ public class DBManager extends AsyncTask<Void, Void, Void>{
                 return null;
             }
         }catch(IOException e){
-            e.printStackTrace();
             Log.d("CONNECTION",e.getMessage());
-            return null;
+            throw e;
         }
+    }
+    @Override
+    protected void onPostExecute(Boolean result) {
+        super.onPostExecute(result);
     }
 }

@@ -33,11 +33,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.R.attr.value;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 /**
  * A login screen that offers login via email/password.
@@ -60,7 +64,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
-    private User myUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -287,7 +290,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 
     /**
@@ -310,14 +312,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Integer doInBackground(Void... params) {
 
             DBManager dbTools = new DBManager(mEmail,mPassword);
+            User myUser;
+            try {
+                if (!dbTools.checkUserExist()) {
+                    //User does not exist
+                    return DBManager.USERNAME_ERROR;
+                }
 
-            if(!dbTools.checkUserExist())
+                myUser = dbTools.tryLogin();
+
+            }catch(IOException e)
             {
-                //User does not exist
-                return DBManager.USERNAME_ERROR;
+                return DBManager.CONNECTION_ERROR;
             }
 
-            myUser = dbTools.tryLogin();
 
             if (myUser != null)
             {
@@ -337,9 +345,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
 
-
             if (success == DBManager.SUCCESS){
                 finish();
+                UserManager.addUser(new User(0,mEmail,mPassword));
                 Intent myIntent = new Intent(LoginActivity.this, MapsActivity.class);
                 startActivity(myIntent);
             }
@@ -350,16 +358,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                DBManager dbTools = null;
-                                finish();
 
-                                dbTools = new DBManager(mEmail, mPassword);
-                                dbTools.execute((Void) null);
+                                Boolean result;
+                                try {
+                                    result = new DBManager(mEmail, mPassword).execute((Void) null).get();
+                                }catch(Exception e){
+                                    result = FALSE;
+                                }
+                                if(result)
+                                {
+                                    finish();
+                                    UserManager.addUser(new User(0,mEmail,mPassword));
+                                    Toast myToast = Toast.makeText(mContext,R.string.updatingReport, Toast.LENGTH_SHORT);
+                                    myToast.show();
+                                    Intent myIntent = new Intent(LoginActivity.this, MapsActivity.class);
+                                    startActivity(myIntent);
+                                }
+                                else
+                                {
+                                    Toast myToast = Toast.makeText(mContext,R.string.NoConnection, Toast.LENGTH_LONG);
+                                    myToast.show();
+                                }
 
-                                Toast myToast = Toast.makeText(mContext,R.string.updatingReport, Toast.LENGTH_SHORT);
-                                myToast.show();
-                                Intent myIntent = new Intent(LoginActivity.this, MapsActivity.class);
-                                startActivity(myIntent);
 
                                 break;
 
@@ -375,10 +395,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 builder.setMessage(R.string.confirm_registry).setPositiveButton(R.string.yes, dialogClickListener)
                         .setNegativeButton(R.string.no, dialogClickListener).show();
             }
-            else
+            else if(success == DBManager.PASSWORD_ERROR)
             {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            }
+            else if(success == DBManager.CONNECTION_ERROR)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this.mContext);
+                builder.setMessage(R.string.NoConnection).show();
             }
         }
 
