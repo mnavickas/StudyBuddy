@@ -2,8 +2,8 @@ package make448greatagain.studybuddy;
 
 /**
  * Created by Michael on 10/25/2016.
+ *
  */
-
 public class User {
     public long userId;
     public String username;

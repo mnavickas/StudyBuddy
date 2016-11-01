@@ -33,8 +33,8 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
-
     }
+
 
     public void onConnectionSuspended(int val)
     {}
