@@ -13,7 +13,7 @@ public class StudyInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_studyInfo);
+        setContentView(R.layout.activity_studyinfo);
     }
     public void goToMaps(View view)
     {

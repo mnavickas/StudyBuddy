@@ -12,7 +12,7 @@ public class User {
     public String courseID;
     public String comments;
 
-    public User(long userId, String username, String password, String courseName, String courseID, String comments){
+    public User(long userId, String username, String password){
         this.userId=userId;
         this.username=username;
         this.password=password;
