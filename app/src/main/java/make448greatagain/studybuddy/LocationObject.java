@@ -4,8 +4,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by Michael on 10/31/2016.
+ *
  */
-
 public class LocationObject {
     String user;
     double lat, lng;

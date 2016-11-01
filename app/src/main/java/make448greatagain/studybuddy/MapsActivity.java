@@ -200,9 +200,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //You can add here other case statements according to your requirement.
         }
     }
+
     private class NearbyClientsPlotter extends Thread{
         private GoogleMap mMap;
-        private LinkedList<Marker> markerLinkedList;
+        final private LinkedList<Marker> markerLinkedList;
         public NearbyClientsPlotter(GoogleMap mMap)
         {
             this.mMap = mMap;
@@ -245,14 +246,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                             }
                         });
-
-
-
                     }
                 }
-
-
-
                 try{
                     sleep(10000);
                 }catch(InterruptedException e)
