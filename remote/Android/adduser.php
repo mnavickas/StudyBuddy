@@ -9,5 +9,5 @@ $hashed = SHA1($user_pass);
 $query = sprintf("INSERT INTO AndroidApp (username,password) VALUES ('%s','%s') ", $user_name, $hashed);
 
 mysqli_query($conn,$query);
-
+mysqli_close($conn);
 ?>
