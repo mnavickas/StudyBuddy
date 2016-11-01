@@ -143,7 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
-        markerOptions.snippet(UserManager.getUser().courseID );
+        markerOptions.snippet(UserManager.getUser().courseID + " " + UserManager.getUser().courseName + " " +UserManager.getUser().comments );
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mCurrentLocationMarker = mMap.addMarker(markerOptions);
 
