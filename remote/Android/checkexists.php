@@ -18,5 +18,5 @@ else
 {
 	echo ("Failure_User");
 }
-
+mysqli_close($conn);
 ?>
