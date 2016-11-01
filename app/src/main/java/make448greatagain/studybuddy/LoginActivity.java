@@ -194,14 +194,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.length() > 4;
+        boolean valid = email.length() > 4;
+        if(email.matches(".*[,:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
+            valid = false;
+        }
+        return valid;
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        boolean valid = password.length() > 4;
+        if(password.matches(".*[,:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
+            valid = false;
+        }
+        return valid;
     }
+
 
     /**
      * Shows the progress UI and hides the login form.
