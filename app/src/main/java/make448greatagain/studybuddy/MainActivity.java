@@ -14,7 +14,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        NearbyClients.getInstance().startThread();
+        //this is going to leak
+        NearbyClients.getInstance().start();
+
 
     }
 

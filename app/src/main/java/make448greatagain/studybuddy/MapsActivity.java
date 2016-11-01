@@ -143,6 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
+        markerOptions.snippet(UserManager.getUser().courseID );
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mCurrentLocationMarker = mMap.addMarker(markerOptions);
 
@@ -200,10 +201,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //You can add here other case statements according to your requirement.
         }
     }
-
     private class NearbyClientsPlotter extends Thread{
         private GoogleMap mMap;
-        final private LinkedList<Marker> markerLinkedList;
+        private LinkedList<Marker> markerLinkedList;
         public NearbyClientsPlotter(GoogleMap mMap)
         {
             this.mMap = mMap;
@@ -246,8 +246,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                             }
                         });
+
+
+
                     }
                 }
+
+
+
                 try{
                     sleep(10000);
                 }catch(InterruptedException e)

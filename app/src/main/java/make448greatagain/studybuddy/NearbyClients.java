@@ -11,8 +11,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -23,9 +26,7 @@ import java.util.TimeZone;
 public class NearbyClients extends Thread {
 
     static LinkedList<LocationObject> locations;
-    static LinkedList<LocationObject> expiredLocations;
-    private volatile boolean running = false;
-    private volatile boolean suspended = false;
+    volatile boolean running = false;
 
     private static NearbyClients sInstance = null;
 
@@ -39,35 +40,16 @@ public class NearbyClients extends Thread {
     }
     private NearbyClients(){
         locations = new LinkedList<>();
-        expiredLocations = new LinkedList<>();
-    }
-
-    public void startThread(){
-        this.start();
-    }
-    public void suspendThread()
-    {
-        try{
-            synchronized (this){
-                this.wait();
-            }
-            suspended = true;
-        }catch(InterruptedException e){Log.e("ClientThread", e.getMessage());}
-    }
-    public void resumeThread(){
-        synchronized (this){
-            this.notify();
-        }
-        suspended = false;
-    }
+    };
 
     public void start()
     {
         if(running) return;
+
         running = true;
+
         super.start();
     }
-
     public void run()
     {
         while(running)
@@ -76,14 +58,10 @@ public class NearbyClients extends Thread {
             String result;
             try{
                 result = pollDatabase();
-                //clear out the old lists
                 synchronized (locations)
                 {
+                    //clear out the old list
                     locations.clear();
-                }
-                synchronized (locations)
-                {
-                    expiredLocations.clear();
                 }
             }catch(IOException e){
                 result = null;
@@ -116,13 +94,6 @@ public class NearbyClients extends Thread {
                             locations.add(locationObject);
                         }
                     }
-                    else if(date != null){
-                        Log.d("Client", "Lat=" + args[1] + " Lng=" + args[2]);
-                        LocationObject locationObject = new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2]));
-                        synchronized (expiredLocations) {
-                            expiredLocations.add(locationObject);
-                        }
-                    }
 
 
                 }
@@ -139,7 +110,7 @@ public class NearbyClients extends Thread {
         }
     }
 
-    private String pollDatabase() throws IOException
+    public String pollDatabase() throws IOException
     {
             URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/getAllLocations.php");
             HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
@@ -168,11 +139,12 @@ public class NearbyClients extends Thread {
             httpcon.setDoInput(true);
             OutputStream outputStream = httpcon.getOutputStream();
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            String post_data = "";
+            String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode("", "UTF-8");
             Log.d("HTTP","Post data= "+post_data);
             bufferedWriter.write(post_data);
             bufferedWriter.flush();
             bufferedWriter.close();
             outputStream.close();
     }
+
 }
