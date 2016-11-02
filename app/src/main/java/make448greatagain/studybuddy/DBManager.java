@@ -1,9 +1,5 @@
 package make448greatagain.studybuddy;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -15,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -23,51 +18,64 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 /**
+ * Manager for General Database Access from Login Screen, off UI Thread
  * Created by Michael on 10/25/2016.
  */
+class DBManager extends AsyncTask<Void, Void, Boolean>{
+    /**
+     * Error Codes From Connection
+     */
+    static final int SUCCESS = 0,USERNAME_ERROR = 1, PASSWORD_ERROR = 2,CONNECTION_ERROR = 3;
+    /**
+     * User information
+     */
+    private final String user,pass;
 
-public class DBManager extends AsyncTask<Void, Void, Boolean>{
-    public static final int SUCCESS = 0;
-    public static final int PASSWORD_ERROR = 2;
-    public static final int USERNAME_ERROR = 1;
-    public static final int CONNECTION_ERROR = 3;
-
-    final String user;
-    final String pass;
-    //final Context context;
-    public DBManager(final String user, final String pass)
+    /**
+     * Create an instance of the manager with default user and password data1
+     * @param user Username
+     * @param pass Password
+     */
+    DBManager(final String user, final String pass)
     {
         this.user = user;
         this.pass = pass;
-       // this.context = context;
     }
 
+    /**
+     * Execute the request
+     * @param url URL to request from
+     * @param httpcon HTTPConnection Instance
+     * @throws IOException
+     */
     private void postData(URL url, final HttpURLConnection httpcon) throws IOException
     {
 
 
-        try {
-            Log.d("CONNECTION", "Start");
-            Log.d("CONNECTION", "URL " + url.toString());
-            Log.d("CONNECTION", "Open Connection");
-            httpcon.setRequestMethod("POST");
-            httpcon.setDoOutput(true);
-            httpcon.setDoInput(true);
-            OutputStream outputStream = httpcon.getOutputStream();
-            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            Log.d("CONNECTION", "BufferedWriter");
-            String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode(this.user, "UTF-8") + "&" +
-                    URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(this.pass, "UTF-8");
-            Log.d("CONNECTION", post_data);
-            bufferedWriter.write(post_data);
-            bufferedWriter.flush();
-            bufferedWriter.close();
-            outputStream.close();
-            Log.d("CONNECTION", "Posted Data");
-        }catch(IOException e){
-            throw e;
-        }
+
+        Log.d("DBManager", "Start");
+        Log.d("DBManager", "URL " + url.toString());
+        Log.d("DBManager", "Open Connection");
+        httpcon.setRequestMethod("POST");
+        httpcon.setDoOutput(true);
+        httpcon.setDoInput(true);
+        OutputStream outputStream = httpcon.getOutputStream();
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode(this.user, "UTF-8") + "&" +
+                URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(this.pass, "UTF-8");
+        Log.d("DBManager", post_data);
+        bufferedWriter.write(post_data);
+        bufferedWriter.flush();
+        bufferedWriter.close();
+        outputStream.close();
+        Log.d("DBManager", "Posted Data");
+
     }
+    /**
+     * Execute the HTTP Request off of the UI Thread
+     * @param params Nothing
+     * @return Nothing
+     */
     protected Boolean doInBackground(Void... params)
     {
         try{
@@ -77,87 +85,84 @@ public class DBManager extends AsyncTask<Void, Void, Boolean>{
 
             InputStream inputStream = httpcon.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-            Log.d("CONNECTION","Read Data");
-            Log.d("CONNECTION","Already Read Data");
+            Log.d("DBManager","Read Data");
             bufferedReader.close();
             inputStream.close();
             httpcon.disconnect();
             return TRUE;
 
         }catch(IOException e){
-            e.printStackTrace();
-            Log.d("CONNECTION",e.getMessage());
+            Log.d("DBManager",e.getMessage());
             return FALSE;
 
         }
     }
 
-    public Boolean checkUserExist() throws IOException
+    /**
+     * Check if the User exists on the database
+     * @return true if exists
+     * @throws IOException
+     */
+    Boolean checkUserExist() throws IOException
     {
 
-        try{
-            URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/checkexists.php");
-            HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-            postData(url,httpcon);
 
-            InputStream inputStream = httpcon.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-            Log.d("CONNECTION","Read Data");
-            String result = "";
-            String line = "";
-            while((line = bufferedReader.readLine())!= null)
-            {
-                result+=line;
-            }
-            Log.d("CONNECTION","Already Read Data");
-            bufferedReader.close();
-            inputStream.close();
-            httpcon.disconnect();
-            Log.d("CONNECTION",result);
-            return result.equals("Success");
-        }catch(IOException e){
-            throw e;
-           // return FALSE;
+        URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/checkexists.php");
+        HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+        postData(url,httpcon);
+
+        InputStream inputStream = httpcon.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+        Log.d("DBManager","Read Data");
+        String result = "";
+        String line;
+        while((line = bufferedReader.readLine())!= null)
+        {
+            result+=line;
         }
+        Log.d("DBManager","Already Read Data");
+        bufferedReader.close();
+        inputStream.close();
+        httpcon.disconnect();
+        Log.d("DBManager",result);
+        return result.equals("Success");
+
     }
 
-    public User tryLogin() throws IOException
+    /**
+     * Attempt to verify user information for login
+     * @return User Object if successful.
+     * @throws IOException
+     */
+    User tryLogin() throws IOException
     {
 
-        try{
-            URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/trylogin.php");
-            HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-            postData(url,httpcon);
 
-            InputStream inputStream = httpcon.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-            Log.d("CONNECTION","Read Data");
-            String result = "";
-            String line = "";
-            while((line = bufferedReader.readLine())!= null)
-            {
-                result+=line;
-            }
-            Log.d("CONNECTION","Already Read Data");
-            bufferedReader.close();
-            inputStream.close();
-            httpcon.disconnect();
-            Log.d("CONNECTION",result);
-            if(result.equals("Success"))
-            {
-                return new User(0,user,pass);
-            }
-            else
-            {
-                return null;
-            }
-        }catch(IOException e){
-            Log.d("CONNECTION",e.getMessage());
-            throw e;
+        URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/trylogin.php");
+        HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+        postData(url,httpcon);
+
+        InputStream inputStream = httpcon.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+        Log.d("DBManager","Read Data");
+        String result = "";
+        String line;
+        while((line = bufferedReader.readLine())!= null)
+        {
+            result+=line;
         }
-    }
-    @Override
-    protected void onPostExecute(Boolean result) {
-        super.onPostExecute(result);
+        Log.d("DBManager","Already Read Data");
+        bufferedReader.close();
+        inputStream.close();
+        httpcon.disconnect();
+        Log.d("DBManager",result);
+        if(result.equals("Success"))
+        {
+            return new User(0,user,pass);
+        }
+        else
+        {
+            return null;
+        }
     }
 }
