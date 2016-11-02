@@ -1,10 +1,10 @@
 package make448greatagain.studybuddy;
 
 /**
- * @author Michael
  * Keep track of active user
+ * @author Michael
  */
-public class UserManager {
+class UserManager {
 
     private static boolean isSet = false;
     private static User sUser;
@@ -12,9 +12,9 @@ public class UserManager {
     * Add the current user
     * @param user current User
     */
-    public static void addUser(User user)
+    static void addUser(User user)
     {
-        sUser=user;
+        sUser = user;
         isSet = true;
     }
     
@@ -39,11 +39,7 @@ public class UserManager {
         }
         else
         {
-            //TODO actually handle this.
-            //for now, force a crash.
-            Object o = null;
-            o.toString();
-            return null;
+            return new User(-1,"NULL","NULL");
         }
     }
 }

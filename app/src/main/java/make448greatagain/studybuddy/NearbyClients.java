@@ -18,18 +18,31 @@ import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 /**
+ * Background Process for polling DB to get Client Locations.
  * Created by Michael on 10/31/2016.
  */
-public class NearbyClients extends Thread {
+class NearbyClients extends Thread {
 
-    static LinkedList<LocationObject> locations;
-    static LinkedList<LocationObject> expiredLocations;
-    private volatile boolean running = false;
-    private volatile boolean suspended = false;
+    /**
+     * Lists of all client locations
+     */
+    static LinkedList<LocationObject> locations, expiredLocations;
 
+    /**
+     * Thread Status
+     */
+    private volatile boolean running = false,suspended = false;
+
+    /**
+     * Singleton instance
+     */
     private static NearbyClients sInstance = null;
 
-    public static NearbyClients getInstance()
+    /**
+     * Single instance
+     * @return this Instance
+     */
+    static NearbyClients getInstance()
     {
        if(sInstance == null)
        {
@@ -37,14 +50,25 @@ public class NearbyClients extends Thread {
        }
         return sInstance;
     }
+
+    /**
+     * Create an Instance
+     */
     private NearbyClients(){
         locations = new LinkedList<>();
         expiredLocations = new LinkedList<>();
     }
 
-    public void startThread(){
+    /**
+     * Wrapper to start Thread
+     */
+    void startThread(){
         this.start();
     }
+
+    /**
+     * Pause Thread Usage
+     */
     public void suspendThread()
     {
         try{
@@ -54,6 +78,10 @@ public class NearbyClients extends Thread {
             suspended = true;
         }catch(InterruptedException e){Log.e("ClientThread", e.getMessage());}
     }
+
+    /**
+     * Resume thread usage
+     */
     public void resumeThread(){
         synchronized (this){
             this.notify();
@@ -61,6 +89,9 @@ public class NearbyClients extends Thread {
         suspended = false;
     }
 
+    /**
+     *  Start thread
+     */
     public void start()
     {
         if(running) return;
@@ -68,6 +99,9 @@ public class NearbyClients extends Thread {
         super.start();
     }
 
+    /**
+     * Run thread until suspended
+     */
     public void run()
     {
         while(running)
@@ -139,6 +173,11 @@ public class NearbyClients extends Thread {
         }
     }
 
+    /**
+     * Get list of all clients
+     * @return String of nearby client results from DB
+     * @throws IOException
+     */
     private String pollDatabase() throws IOException
     {
             URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/getAllLocations.php");
@@ -160,6 +199,12 @@ public class NearbyClients extends Thread {
             return result;
     }
 
+    /**
+     * Execute the request
+     * @param url URL to request from
+     * @param httpcon HTTPConnection Instance
+     * @throws IOException
+     */
     private void postData(URL url, final HttpURLConnection httpcon) throws IOException
     {
             Log.d("HTTP", "URL " + url.toString());

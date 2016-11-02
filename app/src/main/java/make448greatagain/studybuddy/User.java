@@ -1,24 +1,21 @@
 package make448greatagain.studybuddy;
 
 /**
+ * Datafield struct for information about the user
  * Created by Michael on 10/25/2016.
- *
  */
-public class User {
-    public long userId;
-    public String username;
-    public String password;
-    public String courseName;
-    public String courseID;
-    public String comments;
+class User {
+    private long userId;
+    String username;
+    String password;
+    String courseName;
+    String courseID;
+    String comments;
 
-    public User(long userId, String username, String password){
+    User(long userId, String username, String password){
         this.userId=userId;
         this.username=username;
         this.password=password;
-        this.courseName=courseName;
-        this.courseID=courseID;
-        this.comments=comments;
     }
 
 }
