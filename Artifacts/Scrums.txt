@@ -1,0 +1,14 @@
+1)
+Collaborative study app
+allow users to see other users around them and what they are studying
+allow users to register for accounts
+Messaging board and/or private messaging for users.
+Utilize Android platform
+
+2)
+Have a functioning basic android map application that shows current location,
+TODO: Show others' locations and allow users to update info about themselves.
+
+3)
+Now able to see other users.
+Find a workaround for no GPS Signal.

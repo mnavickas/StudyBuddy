@@ -1,0 +1,14 @@
+For this sprint:
+
+Setup Android Studio
+
+Login Page
+Splash Page
+User Info Page
+Map Page
+
+See locations of other users.
+Update location in database as it's being used
+
+Configure mySQL database
+Implement Most if not all of the php files for database connections, hosted on people.eecs.ku.edu
