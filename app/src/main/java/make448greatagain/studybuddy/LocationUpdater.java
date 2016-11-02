@@ -22,9 +22,19 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
         LocationListener {
 
 
+    /**
+     * Client to connect for API Calls
+     */
     private GoogleApiClient mGoogleApiClient;
+    /**
+     * Parent Context
+     */
     private Context parentContext = null;
 
+    /**
+     * Create and start LocationUpdater
+     * @param context Parent Context
+     */
     LocationUpdater(Context context)
     {
         parentContext = context;
@@ -36,18 +46,31 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
     }
 
 
+    /**
+     * Does nothing currently, will revisit if we see errors arising from this.
+     * @param val Connection Code
+     */
     public void onConnectionSuspended(int val)
     {}
 
+    /**
+     * Upon Changing locations, store it in the DB
+     * @param location New Location
+     */
     public void onLocationChanged(Location location){
 
         try {
             new DBLocationManager().execute(new LocationWrapper(location.getLatitude(), location.getLongitude())).get();
         }catch(InterruptedException | ExecutionException e){
+            Log.e("LocationUpdater", e.getMessage());
 
         }
     }
 
+    /**
+     * On connecting to API, initialize location requests.
+     * @param bundle Associated Bundle
+     */
     public void onConnected(Bundle bundle)
     {
         LocationRequest mLocationRequest = new LocationRequest();

@@ -1,15 +1,19 @@
 package make448greatagain.studybuddy;
 
-import com.google.android.gms.maps.model.LatLng;
-
 /**
+ * Wrapper for tying a user to a location
  * Created by Michael on 10/31/2016.
- *
  */
-public class LocationObject {
+class LocationObject {
+    /**
+     * User whose coordinates we have
+     */
     String user;
+    /**
+     * User coordinates
+     */
     double lat, lng;
-    public LocationObject(String user,double lat, double lng){
+    LocationObject(String user, double lat, double lng){
         this.user = user;
         this.lat = lat;
         this.lng = lng;
