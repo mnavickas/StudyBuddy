@@ -27,6 +27,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
 
+import static com.google.android.gms.analytics.internal.zzy.cp;
+
 /**
  * Map Activity, Display Map and its Components
  */
@@ -57,7 +59,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        new LocationUpdater(this);
     }
 
     /**
@@ -86,9 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        //mMap.setOnMarkerClickListener( new markerListener(this));
-       // mMap.setOnInfoWindowClickListener(listener);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
@@ -103,10 +101,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-        new NearbyClientsPlotter(mMap).start();
-
-
+        if(ncp == null)
+        {
+            ncp = new NearbyClientsPlotter(mMap);
+            ncp.start();
+        }
     }
+    private static NearbyClientsPlotter ncp;
 
 
     @Override
@@ -161,8 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("MapsActivity","LOC CHANGE");
-        Location mLastLocation = location;
+        Log.d("MapsActivity","Location Changed");
        
         if (mCurrentLocationMarker != null) {
                 mCurrentLocationMarker.remove();
@@ -172,7 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Current Position");
+        markerOptions.title(getResources().getString(R.string.CurrentPosition));
         markerOptions.snippet(UserManager.getUser().courseID + " " + UserManager.getUser().courseName + " " +UserManager.getUser().comments );
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mCurrentLocationMarker = mMap.addMarker(markerOptions);
@@ -183,15 +183,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
             firstUpdate = false;
         }
-
-
-        //stop location updates
-        //if (mGoogleApiClient != null) {
-           //LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        //}
     }
-
-
 
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -238,11 +230,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     private class NearbyClientsPlotter extends Thread{
         private GoogleMap mMap;
+        volatile boolean running;
         final private LinkedList<Marker> markerLinkedList;
         NearbyClientsPlotter(GoogleMap mMap)
         {
             this.mMap = mMap;
             this.markerLinkedList = new LinkedList<>();
+        }
+        public void start()
+        {
+            running = true;
+            super.start();
         }
 
         /**
@@ -255,46 +253,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        synchronized (markerLinkedList) {
-                            for (int i = 0; i < markerLinkedList.size(); i++) {
-                                markerLinkedList.get(i).remove();
-                            }
+                        for (int i = 0; i < markerLinkedList.size(); i++) {
+                            markerLinkedList.get(i).remove();
                         }
                     }
                 });
 
-                synchronized (NearbyClients.locations) {
-                    for (int i = 0; i < NearbyClients.locations.size(); i++) {
-                        LocationObject locationObject = NearbyClients.locations.get(i);
-                        if(locationObject.user.equalsIgnoreCase(UserManager.getUser().username)){
-                            continue;
-                        }
-                        Log.d("NearbyClientsPlotter", "Lat="+locationObject.lat + " Lng="+locationObject.lng);
-                        LatLng latLng = new LatLng(locationObject.lat, locationObject.lng);
-                        final MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title(locationObject.user+"'s Position");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                synchronized (markerLinkedList) {
-                                    markerLinkedList.add(mMap.addMarker(markerOptions));
-                                }
-                            }
-                        });
+                final LinkedList<MarkerOptions> mo = new LinkedList<>();
+                for (int i = 0; i < NearbyClients.locations.size(); i++) {
+                    LocationObject locationObject = NearbyClients.locations.get(i);
+                    if(locationObject.user.equalsIgnoreCase(UserManager.getUser().username)){
+                        continue;
                     }
+                    Log.d("NearbyClientsPlotter", "User="+locationObject.user+" Lat="+locationObject.lat + " Lng="+locationObject.lng);
+                    LatLng latLng = new LatLng(locationObject.lat, locationObject.lng);
+                    final MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+                    String str = getResources().getString(R.string.UsersPosition);
+                    str = String.format(str,locationObject.user);
+                    markerOptions.title(str);
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+                    mo.add(markerOptions);
                 }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(int i = 0; i < mo.size(); i++ ) {
+                                markerLinkedList.add(mMap.addMarker(mo.get(i)));
+                        }
+                    }
+                });
+
                 try{
-                    sleep(10000);
+                    synchronized (NearbyClients.getInstance().timerMutex)
+                    {
+                        NearbyClients.getInstance().timerMutex.wait(60*1000);
+                        Log.e(this.getClass().getSimpleName(),"ReDrawing");
+                    }
                 }catch(InterruptedException e)
                 {
-                    Log.e("NearbyClientsPlotter",e.getMessage());
+                    Log.e(this.getClass().getSimpleName(),e.getMessage());
                 }
             }
         }
     }
 }
-
-

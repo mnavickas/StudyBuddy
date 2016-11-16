@@ -51,11 +51,7 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
     private void postData(URL url, final HttpURLConnection httpcon) throws IOException
     {
 
-
-
-        Log.d("DBManager", "Start");
         Log.d("DBManager", "URL " + url.toString());
-        Log.d("DBManager", "Open Connection");
         httpcon.setRequestMethod("POST");
         httpcon.setDoOutput(true);
         httpcon.setDoInput(true);
@@ -63,12 +59,10 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode(this.user, "UTF-8") + "&" +
                 URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(this.pass, "UTF-8");
-        Log.d("DBManager", post_data);
         bufferedWriter.write(post_data);
         bufferedWriter.flush();
         bufferedWriter.close();
         outputStream.close();
-        Log.d("DBManager", "Posted Data");
 
     }
     /**
@@ -79,13 +73,16 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
     protected Boolean doInBackground(Void... params)
     {
         try{
+            if(!ConnectivityReceiver.isDataconnected())
+            {
+                return FALSE;
+            }
             URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/adduser.php");
             HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
             postData(url,httpcon);
 
             InputStream inputStream = httpcon.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-            Log.d("DBManager","Read Data");
             bufferedReader.close();
             inputStream.close();
             httpcon.disconnect();
@@ -105,7 +102,10 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
      */
     Boolean checkUserExist() throws IOException
     {
-
+        if(!ConnectivityReceiver.isDataconnected())
+        {
+            throw new IOException();
+        }
 
         URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/checkexists.php");
         HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
@@ -120,7 +120,6 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
         {
             result+=line;
         }
-        Log.d("DBManager","Already Read Data");
         bufferedReader.close();
         inputStream.close();
         httpcon.disconnect();
@@ -136,7 +135,10 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
      */
     User tryLogin() throws IOException
     {
-
+        if(!ConnectivityReceiver.isDataconnected())
+        {
+            throw new IOException();
+        }
 
         URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/trylogin.php");
         HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
@@ -151,7 +153,6 @@ class DBManager extends AsyncTask<Void, Void, Boolean>{
         {
             result+=line;
         }
-        Log.d("DBManager","Already Read Data");
         bufferedReader.close();
         inputStream.close();
         httpcon.disconnect();

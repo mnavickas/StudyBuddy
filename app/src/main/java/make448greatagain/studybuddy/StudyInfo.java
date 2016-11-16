@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * Allow User to input info about themselves.
@@ -30,8 +31,15 @@ public class StudyInfo extends AppCompatActivity {
         UserManager.getUser().comments = ((EditText)findViewById(R.id.comments)).getText().toString();
         UserManager.getUser().courseID = ((EditText)findViewById(R.id.courseID)).getText().toString();
         UserManager.getUser().courseName = ((EditText)findViewById(R.id.courseName)).getText().toString();
-        Intent myIntent = new Intent(StudyInfo.this, MapsActivity.class);
-        startActivity(myIntent);
+        if(ConnectivityReceiver.isGpsconnected())
+        {
+            Intent myIntent = new Intent(StudyInfo.this, MapsActivity.class);
+            startActivity(myIntent);
+        }else{
+            Toast myToast = Toast.makeText(this,R.string.NoGPS, Toast.LENGTH_SHORT);
+            myToast.show();
+        }
+
     }
 
 

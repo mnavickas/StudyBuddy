@@ -1,5 +1,6 @@
 package make448greatagain.studybuddy;
 
+
 /**
  * Keep track of active user
  * @author Michael
@@ -7,6 +8,7 @@ package make448greatagain.studybuddy;
 class UserManager {
 
     private static boolean isSet = false;
+
     private static User sUser;
     /**
     * Add the current user
@@ -39,7 +41,7 @@ class UserManager {
         }
         else
         {
-            return new User(-1,"NULL","NULL");
+            return null;
         }
     }
 }

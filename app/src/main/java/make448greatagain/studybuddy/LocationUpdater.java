@@ -12,7 +12,15 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.concurrent.ExecutionException;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Background task for updating location in the mySQL database.
@@ -20,7 +28,6 @@ import java.util.concurrent.ExecutionException;
  */
 class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
         LocationListener {
-
 
     /**
      * Client to connect for API Calls
@@ -45,7 +52,6 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
         mGoogleApiClient.connect();
     }
 
-
     /**
      * Does nothing currently, will revisit if we see errors arising from this.
      * @param val Connection Code
@@ -53,18 +59,75 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
     public void onConnectionSuspended(int val)
     {}
 
+    private  ExecutorService mThreadPool = Executors.newSingleThreadExecutor();
+
     /**
      * Upon Changing locations, store it in the DB
      * @param location New Location
      */
-    public void onLocationChanged(Location location){
-
-        try {
-            new DBLocationManager().execute(new LocationWrapper(location.getLatitude(), location.getLongitude())).get();
-        }catch(InterruptedException | ExecutionException e){
-            Log.e("LocationUpdater", e.getMessage());
-
+    public void onLocationChanged(final Location location){
+        if(UserManager.getUser() != null) {
+            mThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    update(new LocationWrapper(location.getLatitude(), location.getLongitude()));
+                }
+            });
         }
+    }
+    private Void update(final LocationWrapper loc){
+
+        String username = loc.user.username;
+        double lat = loc.lat;
+        double lng = loc.lng;
+        if(ConnectivityReceiver.isDataconnected()) {
+            long time = System.currentTimeMillis();
+
+            try {
+                URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/updateLocation.php");
+                HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+                postData(url, httpcon, username, lat, lng);
+
+                httpcon.getInputStream().close();
+
+                httpcon.disconnect();
+
+            } catch (IOException e) {
+                Log.e("DBLocationManager", e.getMessage());
+            }
+            time = System.currentTimeMillis()-time;
+            Log.e(this.getClass().getSimpleName(),"Execution Time: "+time);
+        }
+        return null;
+    }
+
+
+    /**
+     * Execute the Request
+     * @param url URL to request from
+     * @param httpcon HTTPConnection Instance
+     * @param user UserName data to post
+     * @param lat Latitude data to post
+     * @param lng Longitude Data to post.
+     * @throws IOException
+     */
+    private void postData(URL url, final HttpURLConnection httpcon, String user, double lat, double lng) throws IOException
+    {
+        Log.d("DBLocationManager", "URL " + url.toString());
+        httpcon.setRequestMethod("POST");
+        httpcon.setDoOutput(true);
+        httpcon.setDoInput(true);
+        OutputStream outputStream = httpcon.getOutputStream();
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode(user, "UTF-8")
+                + "&" +
+                URLEncoder.encode("lat", "UTF-8") + "=" + lat
+                + "&" +
+                URLEncoder.encode("lng", "UTF-8") + "=" + lng;
+        bufferedWriter.write(post_data);
+        bufferedWriter.flush();
+        bufferedWriter.close();
+        outputStream.close();
     }
 
     /**
@@ -74,7 +137,6 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
     public void onConnected(Bundle bundle)
     {
         LocationRequest mLocationRequest = new LocationRequest();
-        // 1 Minute intervals
         mLocationRequest.setInterval(5000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
