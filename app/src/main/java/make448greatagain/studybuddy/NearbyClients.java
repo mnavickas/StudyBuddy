@@ -1,6 +1,5 @@
 package make448greatagain.studybuddy;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,16 +11,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.SimpleTimeZone;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
-import static android.os.Build.VERSION_CODES.M;
-import static com.google.android.gms.internal.zznu.is;
-import static com.google.android.gms.internal.zznu.it;
 
 /**
  * Background Process for polling DB to get Client Locations.
@@ -29,6 +24,9 @@ import static com.google.android.gms.internal.zznu.it;
  */
 class NearbyClients extends Thread {
     private static final int timeToRunMS = 5000;
+
+    //Accept only data that is less than x Minutes old;
+    private final int minutes = 100;
 
     final Object timerMutex = new Object();
 
@@ -40,7 +38,7 @@ class NearbyClients extends Thread {
     /**
      * Thread Status
      */
-    private volatile boolean running = false,suspended = false;
+    private volatile boolean running = false;
 
     /**
      * Singleton instance
@@ -111,41 +109,32 @@ class NearbyClients extends Thread {
 
                 //parse result string
                 String[] results = result.split("&");
-                for (int i = 0; i < results.length; i++) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"));
 
-                    String args[] = results[i].split(",");
-                    java.util.Date date;
+                for (String param: results) {
+                    //[User, lat, long, time]
+                    String args[] = param.split(",");
+                    long date;
                     try {
-                        date = sdf.parse(args[3]);
+                        date = Long.parseLong(args[3]);
                     } catch (Exception e) {
-                        date = null;
+                        date = Long.MAX_VALUE;
                     }
 
-                    TimeZone timeZone = TimeZone.getTimeZone("UTC");
-                    Calendar calendar = Calendar.getInstance(timeZone);
-                    java.util.Date current = calendar.getTime();
+                    long current = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime().getTime();
 
-                    //Accept only data that is less than x Minutes old;
-                    int minutes = 100;
                     long age = Long.MAX_VALUE;
-                    if(date != null)
+                    if(date != Long.MAX_VALUE)
                     {
-                        age = Math.abs(date.getTime() - current.getTime());
+                        age = Math.abs(date - current);
                     }
-                    long ageMinutes = age/(60*1000);
-                    long ageSeconds = age%(60*1000);
+                    String ages =  String.format(Locale.getDefault(),"%d:%02d minutes", TimeUnit.MILLISECONDS.toMinutes(age), TimeUnit.MILLISECONDS.toSeconds(age) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(age)) );
 
-
-                    if (date != null && age < 1000 * 60 * minutes) {
-                        Log.d(this.getClass().getSimpleName(), "Updated: User="+args[0]+" Lat=" + args[1] + " Lng=" + args[2] +" Age="+ageMinutes+":"+ageSeconds);
-                        LocationObject locationObject = new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2]));
-                            tempLocations.add(locationObject);
-                    } else if (date != null) {
-                        Log.d(this.getClass().getSimpleName(),"Expired: User="+args[0]+" Lat=" + args[1] + " Lng=" + args[2] +" Age="+ageMinutes+":"+ageSeconds);
-                        LocationObject locationObject = new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2]));
-                            tempExpiredLocations.add(locationObject);
+                    if (date != Long.MAX_VALUE && age < 1000 * 60 * minutes) {
+                        Log.d(this.getClass().getSimpleName(), "Updated: User="+args[0]+" Lat=" + args[1] + " Lng=" + args[2] +" Age="+ages);
+                        tempLocations.add(new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2])));
+                    } else if (date != Long.MAX_VALUE) {
+                        Log.d(this.getClass().getSimpleName(),"Expired: User="+args[0]+" Lat=" + args[1] + " Lng=" + args[2] +" Age="+ages);
+                        tempExpiredLocations.add(new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2])));
                     }
                 }
                 //if there is a change
@@ -153,9 +142,9 @@ class NearbyClients extends Thread {
                 {
                     locations = tempLocations;
                     expiredLocations = tempExpiredLocations;
+                    Log.e(this.getClass().getSimpleName(),"Retriggering");
                     synchronized (timerMutex)
                     {
-                        Log.e(this.getClass().getSimpleName(),"Retriggering");
                         timerMutex.notify();
                     }
                 }
@@ -171,7 +160,7 @@ class NearbyClients extends Thread {
             }
             catch(InterruptedException e)
             {
-                Log.e("NearbyClients",e.getMessage());
+                Log.e(this.getClass().getSimpleName(),e.getMessage());
             }
         }
     }
@@ -192,7 +181,6 @@ class NearbyClients extends Thread {
             //If all of the new locations have an exact match, no change.
             for(LocationObject locNew: tempNorm)
             {
-
                 if(( UserManager.getUser() != null &&
                          UserManager.getUser().username.equals(locNew.user)))
                 {
@@ -202,12 +190,10 @@ class NearbyClients extends Thread {
                 boolean noMatch = true;
                 for(LocationObject locOld: locations)
                 {
-
                     if (
                         locOld.user.equals(locNew.user) &&
                         Math.abs(locOld.lng - locNew.lng) <= lngEpsilon &&
                         Math.abs(locOld.lat - locNew.lat) <= latEpsilon
-
                         )
                     {
                         noMatch = false;
@@ -218,8 +204,6 @@ class NearbyClients extends Thread {
                 {
                     return true;
                 }
-
-
             }
             for(LocationObject locNew: tempExp)
             {
@@ -228,7 +212,7 @@ class NearbyClients extends Thread {
                 {
                     if  (
                          locOld.user.equals(locNew.user) &&
-                         Math.abs(locOld.lng - locNew.lng) <= lngEpsilon&&
+                         Math.abs(locOld.lng - locNew.lng) <= lngEpsilon &&
                          Math.abs(locOld.lat - locNew.lat) <= latEpsilon
                         )
                     {

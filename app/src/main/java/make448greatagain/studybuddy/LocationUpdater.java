@@ -19,6 +19,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -119,11 +121,15 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
         httpcon.setDoInput(true);
         OutputStream outputStream = httpcon.getOutputStream();
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        long date = Calendar.getInstance(timeZone).getTime().getTime();
         String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode(user, "UTF-8")
                 + "&" +
                 URLEncoder.encode("lat", "UTF-8") + "=" + lat
                 + "&" +
-                URLEncoder.encode("lng", "UTF-8") + "=" + lng;
+                URLEncoder.encode("lng", "UTF-8") + "=" + lng
+                + "&" +
+                URLEncoder.encode("time", "UTF-8") + "=" + date;
         bufferedWriter.write(post_data);
         bufferedWriter.flush();
         bufferedWriter.close();
