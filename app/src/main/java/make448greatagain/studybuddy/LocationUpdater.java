@@ -69,6 +69,7 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
      */
     public void onLocationChanged(final Location location){
         if(UserManager.getUser() != null) {
+            UserManager.getUser().location = location;
             mThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {

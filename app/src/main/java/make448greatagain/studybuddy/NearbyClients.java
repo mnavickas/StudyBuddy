@@ -17,6 +17,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import make448greatagain.studybuddy.Messaging.*;
+import make448greatagain.studybuddy.Messaging.MessageHandler;
+import make448greatagain.studybuddy.Messaging.PrivateMessage;
+
 
 /**
  * Background Process for polling DB to get Client Locations.
@@ -243,8 +247,8 @@ class NearbyClients extends Thread {
         }
         long time = System.currentTimeMillis();
         URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/getAllLocations.php");
-        HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-        postData(url,httpcon);
+        HttpURLConnection httpcon = NetworkingConnection.createNewConnection(url);
+        postData(httpcon);
 
         InputStream inputStream = httpcon.getInputStream();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
@@ -264,16 +268,11 @@ class NearbyClients extends Thread {
 
     /**
      * Execute the request
-     * @param url URL to request from
      * @param httpcon HTTPConnection Instance
      * @throws IOException
      */
-    private void postData(URL url, final HttpURLConnection httpcon) throws IOException
+    private void postData(final HttpURLConnection httpcon) throws IOException
     {
-            Log.d("HTTP", "URL " + url.toString());
-            httpcon.setRequestMethod("POST");
-            httpcon.setDoOutput(true);
-            httpcon.setDoInput(true);
             OutputStream outputStream = httpcon.getOutputStream();
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             String post_data = "";

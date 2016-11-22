@@ -27,7 +27,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
 
-import static com.google.android.gms.analytics.internal.zzy.cp;
 
 /**
  * Map Activity, Display Map and its Components

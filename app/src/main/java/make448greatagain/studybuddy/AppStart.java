@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import make448greatagain.studybuddy.Messaging.MessageHandler;
+
 /**
  * Created by Michael on 11/3/2016.
  */
@@ -21,6 +23,7 @@ public class AppStart extends Application {
         super.onCreate();
         NearbyClients.getInstance().startThread();
         new LocationUpdater(this);
+        MessageHandler.subscribeServices();
 
         boolean dataconnected = false;
         boolean gpsconnected = false;
@@ -28,12 +31,7 @@ public class AppStart extends Application {
         if(cm != null )
         {
             NetworkInfo ni = cm.getActiveNetworkInfo();
-            if(ni != null)
-            {
-                dataconnected = ni.isConnected();
-            }else{
-                dataconnected = false;
-            }
+            dataconnected = ni!= null && ni.isConnected();
         }
         LocationManager lm = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         if(lm != null)
