@@ -21,12 +21,13 @@ public class AppStart extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        NearbyClients.getInstance().startThread();
-        new LocationUpdater(this);
+        NearbyClients.subscribeServices();
+        LocationUpdater.subscribeServices(this);
         MessageHandler.subscribeServices();
 
         boolean dataconnected = false;
         boolean gpsconnected = false;
+
         ConnectivityManager cm = ((ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE));
         if(cm != null )
         {
@@ -41,7 +42,7 @@ public class AppStart extends Application {
 
         ConnectivityReceiver.setDataConnected(dataconnected);
         ConnectivityReceiver.setGpsConnected(gpsconnected);
-        Log.e(this.getClass().getSimpleName(),"Data: "+dataconnected);
-        Log.e(this.getClass().getSimpleName(),"GPS: "+gpsconnected);
+        Log.d(this.getClass().getSimpleName(),"Data: "+dataconnected);
+        Log.d(this.getClass().getSimpleName(),"GPS: "+gpsconnected);
     }
 }

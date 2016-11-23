@@ -27,11 +27,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
 
+import static android.os.Build.VERSION_CODES.N;
+
 
 /**
  * Map Activity, Display Map and its Components
  */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+public class MapsActivity extends AppActionBarActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
@@ -59,6 +61,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+    public void onBackPressed(){
+        close();
+    }
+    private void close(){
+        mGoogleApiClient.disconnect();
+        ncp.running = false;
+        synchronized (NearbyClients.getInstance().timerMutex){
+           NearbyClients.getInstance().timerMutex.notify();
+        }
+
+        try{
+            ncp.join();
+        }catch(InterruptedException e){
+            //
+        }
+        super.onBackPressed();
+    }
+
 
     /**
      * Create the API Client for GoogleMaps and start it.
@@ -247,7 +267,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          */
         public void run()
         {
-            while(true)
+            while(running)
             {
                 runOnUiThread(new Runnable() {
                     @Override

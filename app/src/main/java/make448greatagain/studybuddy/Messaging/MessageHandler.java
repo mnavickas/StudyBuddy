@@ -107,7 +107,6 @@ public class MessageHandler{
             list = new messageReceiver().execute( user ).get();
         }catch(ExecutionException | InterruptedException e){
             list = new LinkedList<>();
-            Log.wtf("MessageHandler",e.getMessage());
         }
         return list;
     }

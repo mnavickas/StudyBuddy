@@ -127,7 +127,7 @@ public class LoginActivity extends AppCompatActivity{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password,this);
+            mAuthTask = new UserLoginTask(email, password,this,this);
             mAuthTask.execute((Void) null);
         }
     }
@@ -203,11 +203,13 @@ public class LoginActivity extends AppCompatActivity{
         private final String mEmail;
         private final String mPassword;
         private final Context mContext;
+        private final AppCompatActivity app;
 
-        UserLoginTask(String email, String password, Context context) {
+        UserLoginTask(String email, String password, Context context, AppCompatActivity app) {
             mEmail = email;
             mPassword = password;
             mContext= context;
+            this.app = app;
         }
 
         @Override
@@ -249,9 +251,16 @@ public class LoginActivity extends AppCompatActivity{
 
             if (success == DBManager.SUCCESS){
                 finish();
-                UserManager.addUser(new User(0,mEmail,mPassword));
+                try{
+                    UserManager.addUser(new User(0,mEmail,mPassword));
+                }catch(NewUserBeforeRemoveException e){
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+
                 Intent myIntent = new Intent(LoginActivity.this, StudyInfo.class);
                 startActivity(myIntent);
+                app.finish();
             }
             else if(success == DBManager.USERNAME_ERROR)
             {
@@ -270,11 +279,17 @@ public class LoginActivity extends AppCompatActivity{
                                 if(result)
                                 {
                                     finish();
-                                    UserManager.addUser(new User(0,mEmail,mPassword));
+                                    try{
+                                        UserManager.addUser(new User(0,mEmail,mPassword));
+                                    }catch(NewUserBeforeRemoveException e){
+                                        e.printStackTrace();
+                                        System.exit(0);
+                                    }
                                     Toast myToast = Toast.makeText(mContext,R.string.updatingReport, Toast.LENGTH_SHORT);
                                     myToast.show();
                                     Intent myIntent = new Intent(LoginActivity.this, StudyInfo.class);
                                     startActivity(myIntent);
+                                    app.finish();
                                 }
                                 else
                                 {

@@ -10,7 +10,7 @@ import android.widget.Toast;
 /**
  * Allow User to input info about themselves.
  */
-public class StudyInfo extends AppCompatActivity {
+public class StudyInfo extends AppActionBarActivity {
 
     /**
      * Create the activity

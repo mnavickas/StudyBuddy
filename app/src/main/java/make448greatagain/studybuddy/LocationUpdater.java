@@ -44,7 +44,7 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
      * Create and start LocationUpdater
      * @param context Parent Context
      */
-    LocationUpdater(Context context)
+    private LocationUpdater(Context context)
     {
         parentContext = context;
         mGoogleApiClient = new GoogleApiClient.Builder(context)
@@ -52,6 +52,11 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
+    }
+
+    private static LocationUpdater locationUpdater;
+    public static void subscribeServices(Context context){
+        locationUpdater = new LocationUpdater(context);
     }
 
     /**

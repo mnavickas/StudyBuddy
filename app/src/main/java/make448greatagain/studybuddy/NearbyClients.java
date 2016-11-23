@@ -55,10 +55,10 @@ class NearbyClients extends Thread {
      */
     static NearbyClients getInstance()
     {
-       if(sInstance == null)
-       {
-           sInstance = new NearbyClients();
-       }
+        if(sInstance == null)
+        {
+            sInstance = new NearbyClients();
+        }
         return sInstance;
     }
 
@@ -68,6 +68,9 @@ class NearbyClients extends Thread {
     private NearbyClients(){
         locations = new LinkedList<>();
         expiredLocations = new LinkedList<>();
+    }
+    public static void subscribeServices(){
+        getInstance().startThread();
     }
 
     /**
