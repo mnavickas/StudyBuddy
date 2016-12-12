@@ -3,11 +3,12 @@ package make448greatagain.studybuddy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
+import make448greatagain.studybuddy.Activities.AppPrefaceActivity;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppPrefaceActivity {
 
     /**
      * Create the activity

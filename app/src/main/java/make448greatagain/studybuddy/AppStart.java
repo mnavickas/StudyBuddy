@@ -11,18 +11,21 @@ import make448greatagain.studybuddy.Messaging.MessageHandler;
 
 /**
  * Created by Michael on 11/3/2016.
+ *
  */
-
 public class AppStart extends Application {
 
-    public AppStart(){
-
-    }
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Always runs, constantly updating other client locations
         NearbyClients.subscribeServices();
+
+        // Only runs when the user is valid.
         LocationUpdater.subscribeServices(this);
+
+        // Only runs when messages are queued to send.
         MessageHandler.subscribeServices();
 
         boolean dataconnected = false;

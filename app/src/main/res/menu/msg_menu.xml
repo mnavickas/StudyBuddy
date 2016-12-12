@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <!-- Logout-->
+    <item android:id="@+id/logout"
+        android:icon="@drawable/ic_login_screen"
+        android:title="Logout"
+        app:showAsAction="ifRoom" />
+
+    <!-- Go to Messaging -->
+    <item android:id="@+id/tempAction"
+        android:icon="@drawable/ic_action_chat"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+
+
+
+</menu><!-- Search / will display always -->

@@ -1,11 +1,12 @@
 package make448greatagain.studybuddy;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import make448greatagain.studybuddy.Activities.AppActionBarActivity;
 
 /**
  * Allow User to input info about themselves.
@@ -20,6 +21,10 @@ public class StudyInfo extends AppActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_studyinfo);
+    }
+    public void onBackPressed(){
+        UserManager.logout();
+        super.onBackPressed();
     }
 
     /**

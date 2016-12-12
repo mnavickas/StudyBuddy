@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity{
      */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UserManager.logout();
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -139,7 +140,7 @@ public class LoginActivity extends AppCompatActivity{
      */
     private boolean isEmailValid(String email) {
         boolean valid = email.length() > 4;
-        if(email.matches(".*[,:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
+        if(email.matches(".*[,;:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
             valid = false;
         }
         return valid;
@@ -151,7 +152,7 @@ public class LoginActivity extends AppCompatActivity{
      */
     private boolean isPasswordValid(String password) {
         boolean valid = password.length() > 4;
-        if(password.matches(".*[,:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
+        if(password.matches(".*[,;:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
             valid = false;
         }
         return valid;

@@ -18,13 +18,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 
-import static com.google.android.gms.internal.zznu.ic;
 
 /**
  * Keep track of active user
  * @author Michael
  */
-class UserManager {
+public class UserManager {
 
     private static boolean isSet = false;
 
@@ -78,6 +77,7 @@ class UserManager {
     public static void logout(){
         isSet = false;
         sUser = null;
+        friends = null;
     }
     public static void populateFriends(){
 

@@ -6,9 +6,9 @@ import android.location.Location;
  * Datafield struct for information about the user
  * Created by Michael on 10/25/2016.
  */
-class User {
+public class User {
     private long userId;
-    String username;
+    public String username;
     String password;
     String courseName;
     String courseID;

@@ -17,10 +17,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import make448greatagain.studybuddy.Messaging.*;
-import make448greatagain.studybuddy.Messaging.MessageHandler;
-import make448greatagain.studybuddy.Messaging.PrivateMessage;
-
 
 /**
  * Background Process for polling DB to get Client Locations.
@@ -250,6 +246,7 @@ class NearbyClients extends Thread {
         }
         long time = System.currentTimeMillis();
         URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/getAllLocations.php");
+        Log.e(this.getClass().getSimpleName(),url.toString());
         HttpURLConnection httpcon = NetworkingConnection.createNewConnection(url);
         postData(httpcon);
 

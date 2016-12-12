@@ -1,15 +1,16 @@
 package make448greatagain.studybuddy;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,7 +28,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
 
-import static android.os.Build.VERSION_CODES.N;
+import make448greatagain.studybuddy.Activities.AppActionBarActivity;
+import make448greatagain.studybuddy.Messaging.PopupMessageCreator;
+
+import static make448greatagain.studybuddy.R.id.map;
 
 
 /**
@@ -48,6 +52,8 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
      */
     private GoogleApiClient mGoogleApiClient;
 
+    private Context context;
+
     /**
      * Create the activity
      * @param savedInstanceState Android instance state
@@ -55,27 +61,31 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
      */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.context = this;
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFragment.getMapAsync(this);
     }
     public void onBackPressed(){
         close();
     }
     private void close(){
-        mGoogleApiClient.disconnect();
+
         ncp.running = false;
         synchronized (NearbyClients.getInstance().timerMutex){
            NearbyClients.getInstance().timerMutex.notify();
         }
-
         try{
             ncp.join();
         }catch(InterruptedException e){
             //
         }
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+        mGoogleApiClient.disconnect();
         super.onBackPressed();
     }
 
@@ -128,10 +138,10 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
     }
     private static NearbyClientsPlotter ncp;
 
-
+    LocationRequest mLocationRequest;
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest = new LocationRequest();
 
             mLocationRequest.setInterval(1000);
             mLocationRequest.setFastestInterval(1000);
@@ -147,6 +157,16 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
             Log.e("MapsActivity","API Services Start Error");
         }
 
+    }
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch(item.getItemId())
+        {
+            case R.id.logout:
+                close();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -185,14 +205,15 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
        
         if (mCurrentLocationMarker != null) {
                 mCurrentLocationMarker.remove();
-            }
+        }
+
 
         //place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(getResources().getString(R.string.CurrentPosition));
-        markerOptions.snippet(UserManager.getUser().courseID + " " + UserManager.getUser().courseName + " " +UserManager.getUser().comments );
+        markerOptions.snippet(UserManager.getUser().courseID + " " + UserManager.getUser().courseName + " " + UserManager.getUser().comments );
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mCurrentLocationMarker = mMap.addMarker(markerOptions);
 
@@ -202,7 +223,22 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
             mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
             firstUpdate = false;
         }
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+
+            @Override
+            public boolean onMarkerClick(Marker arg0) {
+
+                String[] args = arg0.getTitle().split("'");
+                if(!(getResources().getString(R.string.CurrentPosition).equals(args[0]))){
+                    PopupMessageCreator.create(context,args[0]);
+                }
+
+
+                return true;
+            }
+        });
     }
+
 
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -292,6 +328,7 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
                     str = String.format(str,locationObject.user);
                     markerOptions.title(str);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
 
                     mo.add(markerOptions);
                 }

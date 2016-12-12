@@ -41,8 +41,8 @@
             android:name=".FriendsListActivity"
             android:label="Contact List" />
         <activity
-            android:name=".ListItemActivity"
-            android:label="Ugh" />
+            android:name=".Messaging.MessagesListActivity"
+            android:label="Messaging" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />

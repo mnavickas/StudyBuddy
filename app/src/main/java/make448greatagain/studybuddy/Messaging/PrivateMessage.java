@@ -16,7 +16,7 @@ public class PrivateMessage {
     {
         this.user_from = from;
         this.user_to = to;
-        this.msg = msg;
+        this.msg = msg.replaceAll("^", "").replaceAll("," , "");
         this.msg_id = hash();
     }
     public PrivateMessage(final String to, final String from, String msg, long hash)
