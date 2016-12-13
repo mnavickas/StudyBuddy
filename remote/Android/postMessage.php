@@ -11,7 +11,7 @@ $query =
 sprintf
 (
 	"INSERT INTO AndroidMessaging ( user_to, user_from, msg, msg_id ) VALUES('%s', '%s', '%s', '%s')"
-         , $user_from, $user_to, $msg, $msg_id
+         , $user_to, $user_from, $msg, $msg_id
 );
 
 
