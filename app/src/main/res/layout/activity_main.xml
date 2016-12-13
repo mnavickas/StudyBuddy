@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="make448greatagain.studybuddy.MainActivity"
-    android:background="@color/colorPrimaryDark">
+    android:background="@drawable/ic_cast_white">
 
     <TextView
         android:text="Welcome To StudyBuddy"
@@ -22,20 +22,20 @@
         android:textStyle="normal|bold|italic"
         android:fontFamily="serif"
         android:typeface="normal"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textColor="@color/colorPrimaryDark"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textAlignment="center" />
 
+
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:color/holo_orange_light"
+        android:layout_height="250dp"
+        app:srcCompat="@drawable/grade"
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
         android:layout_above="@+id/button2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:id="@+id/imageView" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:text="Press to Continue"
@@ -43,7 +43,9 @@
         android:layout_height="wrap_content"
         android:onClick="goToLogin"
         android:id="@+id/button2"
-        android:layout_centerVertical="true"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_marginBottom="47dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
 
