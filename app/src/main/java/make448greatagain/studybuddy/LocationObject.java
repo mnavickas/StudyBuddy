@@ -13,10 +13,15 @@ class LocationObject {
      * User coordinates
      */
     double lat, lng;
-    LocationObject(String user, double lat, double lng){
+
+    String course,subject,comment;
+    LocationObject(String user, double lat, double lng,String course,String subject,String comment){
         this.user = user;
         this.lat = lat;
         this.lng = lng;
+        this.comment = comment;
+        this.course = course;
+        this.subject = subject;
     }
 
 }

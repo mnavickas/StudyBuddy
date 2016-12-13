@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 
+import static android.R.attr.data;
+
 
 /**
  * Keep track of active user
@@ -85,6 +87,145 @@ public class UserManager {
             friends = new friendQuery().execute(sUser).get();
         }catch(InterruptedException | ExecutionException e){
             Log.e("User Manager",e.getMessage());
+        }
+    }
+    public static void addFriend(String friend){
+        if(!friends.contains(friend))
+        {
+            friends.add(friend);
+            new addFriendTask().execute(friends);
+        }
+
+    }
+    public static void updateInfo(){
+        new updateInfoTask().execute();
+    }
+    private static class updateInfoTask extends AsyncTask<Void,Void,Void>{
+        protected Void doInBackground(Void... params){
+
+            try{
+                pollDatabase();
+            }catch(IOException e){
+                //
+            }
+
+            return null;
+        }
+        private String pollDatabase() throws IOException
+        {
+
+            if(!ConnectivityReceiver.isDataconnected())
+            {
+                throw new IOException();
+            }
+            long time = System.currentTimeMillis();
+            URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/studyInfo.php");
+            HttpURLConnection httpcon = NetworkingConnection.createNewConnection(url);
+            postData(httpcon);
+            InputStream inputStream = httpcon.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+            String result = "";
+            String line;
+            while((line = bufferedReader.readLine())!= null)
+            {
+                result+=line;
+            }
+            bufferedReader.close();
+            inputStream.close();
+            httpcon.disconnect();
+            time = System.currentTimeMillis()-time;
+            Log.e(this.getClass().getSimpleName(),"Execution Time: "+time);
+            Log.e(this.getClass().getSimpleName(),result);
+            return result;
+        }
+
+        /**
+         * Execute the request
+         * @param httpcon HTTPConnection Instance
+         * @throws IOException
+         */
+        private void postData(final HttpURLConnection httpcon) throws IOException
+        {
+            OutputStream outputStream = httpcon.getOutputStream();
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            String post_data = URLEncoder.encode("user", "UTF-8") + "=" + URLEncoder.encode(sUser.username, "UTF-8")
+                    + "&" +
+                    URLEncoder.encode("course", "UTF-8") + "=" + URLEncoder.encode(sUser.courseName, "UTF-8")
+                    + "&" +
+                    URLEncoder.encode("subject", "UTF-8") + "=" + URLEncoder.encode(sUser.courseID, "UTF-8")
+                    + "&" +
+                    URLEncoder.encode("comments", "UTF-8") + "=" + URLEncoder.encode(sUser.comments, "UTF-8");
+            bufferedWriter.write(post_data);
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            outputStream.close();
+        }
+    }
+    private static class addFriendTask extends AsyncTask<LinkedList<String>,Void,Void>{
+
+        @Override
+        protected Void doInBackground(LinkedList<String>... params) {
+            LinkedList<String> friends = params[0];
+            int i = 0;
+            String data = "";
+            for(;i<friends.size()-1;i++){
+                data+=friends.get(i);
+                data+=",";
+            }
+            data+=friends.get(i);
+            try{
+                pollDatabase(data);
+            }catch(IOException e){
+                //
+            }
+
+
+            return null;
+        }
+        private String pollDatabase(String data) throws IOException
+        {
+
+            if(!ConnectivityReceiver.isDataconnected())
+            {
+                throw new IOException();
+            }
+            long time = System.currentTimeMillis();
+            URL url = new URL("https://people.eecs.ku.edu/~mnavicka/Android/addUserFriends.php");
+            HttpURLConnection httpcon = NetworkingConnection.createNewConnection(url);
+            postData(httpcon,data);
+            InputStream inputStream = httpcon.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+            String result = "";
+            String line;
+            while((line = bufferedReader.readLine())!= null)
+            {
+                result+=line;
+            }
+            bufferedReader.close();
+            inputStream.close();
+            httpcon.disconnect();
+            time = System.currentTimeMillis()-time;
+            Log.e(this.getClass().getSimpleName(),"Execution Time: "+time);
+            Log.e(this.getClass().getSimpleName(),result);
+            return result;
+        }
+
+        /**
+         * Execute the request
+         * @param httpcon HTTPConnection Instance
+         * @throws IOException
+         */
+        private void postData(final HttpURLConnection httpcon, String data) throws IOException
+        {
+            OutputStream outputStream = httpcon.getOutputStream();
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            String post_data = URLEncoder.encode("friends", "UTF-8") + "=" + URLEncoder.encode(data, "UTF-8")
+                    + "&" +
+                    URLEncoder.encode("user", "UTF-8") + "=" + URLEncoder.encode(sUser.username, "UTF-8");
+            bufferedWriter.write(post_data);
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            outputStream.close();
         }
     }
     private static class friendQuery extends AsyncTask<User, Void, LinkedList<String>>{

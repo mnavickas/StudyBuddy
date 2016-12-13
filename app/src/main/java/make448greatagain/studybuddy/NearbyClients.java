@@ -114,13 +114,17 @@ class NearbyClients extends Thread {
                 String[] results = result.split("&");
 
                 for (String param: results) {
-                    //[User, lat, long, time]
+                    //[User, lat, long, time,course,subject,comments]
                     String args[] = param.split(",");
                     long date;
                     try {
                         date = Long.parseLong(args[3]);
                     } catch (Exception e) {
                         date = Long.MAX_VALUE;
+                    }
+                    if(args.length!=7){
+                        String[] temp = {args[0],args[1],args[2],args[3],"","",""};
+                        args = temp;
                     }
 
                     long current = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime().getTime();
@@ -134,10 +138,10 @@ class NearbyClients extends Thread {
 
                     if (date != Long.MAX_VALUE && age < 1000 * 60 * minutes) {
                         Log.d(this.getClass().getSimpleName(), "Updated: User="+args[0]+" Lat=" + args[1] + " Lng=" + args[2] +" Age="+ages);
-                        tempLocations.add(new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2])));
+                        tempLocations.add(new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2]),args[4],args[5],args[6]));
                     } else if (date != Long.MAX_VALUE) {
                         Log.d(this.getClass().getSimpleName(),"Expired: User="+args[0]+" Lat=" + args[1] + " Lng=" + args[2] +" Age="+ages);
-                        tempExpiredLocations.add(new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2])));
+                        tempExpiredLocations.add(new LocationObject(args[0], Double.parseDouble(args[1]), Double.parseDouble(args[2]),args[4],args[5],args[6]));
                     }
                 }
                 //if there is a change

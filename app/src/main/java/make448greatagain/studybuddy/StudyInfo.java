@@ -33,9 +33,10 @@ public class StudyInfo extends AppActionBarActivity {
      */
     public void goToMaps(View view)
     {
-        UserManager.getUser().comments = ((EditText)findViewById(R.id.comments)).getText().toString();
-        UserManager.getUser().courseID = ((EditText)findViewById(R.id.courseID)).getText().toString();
-        UserManager.getUser().courseName = ((EditText)findViewById(R.id.courseName)).getText().toString();
+        UserManager.getUser().comments = ((EditText)findViewById(R.id.comments)).getText().toString().replace("&","").replace(",","");
+        UserManager.getUser().courseID = ((EditText)findViewById(R.id.courseID)).getText().toString().replace("&","").replace(",","");
+        UserManager.getUser().courseName = ((EditText)findViewById(R.id.courseName)).getText().toString().replace("&","").replace(",","");
+        UserManager.updateInfo();
         if(ConnectivityReceiver.isGpsconnected())
         {
             Intent myIntent = new Intent(StudyInfo.this, MapsActivity.class);

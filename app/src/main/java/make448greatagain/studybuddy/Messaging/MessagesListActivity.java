@@ -12,7 +12,6 @@ import java.util.TimerTask;
 
 import make448greatagain.studybuddy.Activities.AppViewMessageActivity;
 import make448greatagain.studybuddy.R;
-import make448greatagain.studybuddy.UserManager;
 
 public class MessagesListActivity extends AppViewMessageActivity{
 

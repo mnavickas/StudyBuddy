@@ -2,6 +2,7 @@ package make448greatagain.studybuddy;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -213,7 +214,11 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(getResources().getString(R.string.CurrentPosition));
-        markerOptions.snippet(UserManager.getUser().courseID + " " + UserManager.getUser().courseName + " " + UserManager.getUser().comments );
+        if(UserManager.getUser() != null)
+        {
+            markerOptions.snippet(UserManager.getUser().courseID + " " + UserManager.getUser().courseName + " " + UserManager.getUser().comments );
+        }
+
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mCurrentLocationMarker = mMap.addMarker(markerOptions);
 
@@ -223,18 +228,15 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
             mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
             firstUpdate = false;
         }
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
-            public boolean onMarkerClick(Marker arg0) {
-
-                String[] args = arg0.getTitle().split("'");
+            public void onInfoWindowClick(Marker marker) {
+                String[] args = marker.getTitle().split("'");
                 if(!(getResources().getString(R.string.CurrentPosition).equals(args[0]))){
+                    UserManager.addFriend(args[0]);
                     PopupMessageCreator.create(context,args[0]);
                 }
-
-
-                return true;
             }
         });
     }
@@ -327,9 +329,11 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
                     String str = getResources().getString(R.string.UsersPosition);
                     str = String.format(str,locationObject.user);
                     markerOptions.title(str);
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
-
+                    if(!locationObject.subject.equals("") && !locationObject.course.equals(""))
+                    {
+                        markerOptions.snippet("Course: "+locationObject.course+"-"+locationObject.subject);
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    }
                     mo.add(markerOptions);
                 }
 
