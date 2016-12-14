@@ -61,7 +61,7 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
     /**
      * Handler thread for plotting clients onto the map
      */
-    private static NearbyClientsPlotter ncp;
+    private NearbyClientsPlotter ncp;
 
     /**
      * Location request object containing details
@@ -112,6 +112,7 @@ public class MapsActivity extends AppActionBarActivity implements OnMapReadyCall
         }catch(InterruptedException e){
             //
         }
+        ncp = null;
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
