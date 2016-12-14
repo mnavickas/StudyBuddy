@@ -15,6 +15,10 @@ import make448greatagain.studybuddy.Messaging.MessageHandler;
  */
 public class AppStart extends Application {
 
+    /**
+     * Run on application start
+     * This starts background services and initializes network handlers.
+     */
     @Override
     public void onCreate() {
         super.onCreate();

@@ -13,15 +13,26 @@ import make448greatagain.studybuddy.UserManager;
 
 /**
  * Created by Michael on 12/2/2016.
+ * AppBar for messaging activity
  */
-
 public class AppMessagingActivity extends AppCompatActivity {
+    /**
+     * On creation
+     * @param menu Menu to inflate
+     * @return Success Status
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.msg_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /**
+     * Handle item clicked
+     * @param item Menu Item that was pressed
+     * @return success status
+     */
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch(item.getItemId())

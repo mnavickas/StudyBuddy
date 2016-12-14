@@ -6,8 +6,8 @@ import java.net.URL;
 
 /**
  * Created by Michael on 11/21/2016.
+ * Create an HttpURLConnection Object
  */
-
 public class NetworkingConnection {
     public static HttpURLConnection createNewConnection(URL url) throws IOException
     {

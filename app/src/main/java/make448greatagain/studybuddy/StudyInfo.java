@@ -22,6 +22,10 @@ public class StudyInfo extends AppActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_studyinfo);
     }
+
+    /**
+     * Logout the current user if we go back.
+     */
     public void onBackPressed(){
         UserManager.logout();
         super.onBackPressed();

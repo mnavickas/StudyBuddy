@@ -31,7 +31,6 @@ class LocationWrapper {
      * Ties values to current User
      * @param coord User Coordinates
      */
-    @SuppressWarnings("unused")
     public LocationWrapper(LatLng coord){
         this.user = UserManager.getUser();
         this.lat = coord.latitude;

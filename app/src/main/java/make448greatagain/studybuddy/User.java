@@ -7,12 +7,19 @@ import android.location.Location;
  * Created by Michael on 10/25/2016.
  */
 public class User {
+    /** DataField */
     private long userId;
+    /** DataField */
     public String username;
+    /** DataField */
     String password;
+    /** DataField */
     String courseName;
+    /** DataField */
     String courseID;
+    /** DataField */
     String comments;
+    /** DataField */
     Location location;
 
     User(long userId, String username, String password){

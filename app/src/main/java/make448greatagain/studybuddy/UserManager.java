@@ -26,13 +26,25 @@ import static android.R.attr.data;
  * @author Michael
  */
 public class UserManager {
-
+    /**
+     * Flag for if the user has been set
+     */
     private static boolean isSet = false;
 
+    /**
+     * Current user
+     */
     private static User sUser;
 
+    /**
+     * List of current users friends
+     */
     private static LinkedList<String> friends;
 
+    /**
+     * Get Friends
+     * @return list of current user's friends
+     */
     static LinkedList<String> getFriends(){
         return friends;
     }
@@ -76,11 +88,19 @@ public class UserManager {
             return null;
         }
     }
+
+    /**
+     * Logout the current user
+     */
     public static void logout(){
         isSet = false;
         sUser = null;
         friends = null;
     }
+
+    /**
+     * Get User friends from database
+     */
     public static void populateFriends(){
 
         try {
@@ -89,6 +109,11 @@ public class UserManager {
             Log.e("User Manager",e.getMessage());
         }
     }
+
+    /**
+     * Add a user friend and store on DB
+     * @param friend Friend to add
+     */
     public static void addFriend(String friend){
         if(!friends.contains(friend))
         {
@@ -97,9 +122,17 @@ public class UserManager {
         }
 
     }
+
+    /**
+     * Update User study info
+     */
     public static void updateInfo(){
         new updateInfoTask().execute();
     }
+
+    /**
+     * Background task to update study info
+     */
     private static class updateInfoTask extends AsyncTask<Void,Void,Void>{
         protected Void doInBackground(Void... params){
 
@@ -161,6 +194,9 @@ public class UserManager {
             outputStream.close();
         }
     }
+    /**
+     * Background task to add a friend
+     */
     private static class addFriendTask extends AsyncTask<LinkedList<String>,Void,Void>{
 
         @Override

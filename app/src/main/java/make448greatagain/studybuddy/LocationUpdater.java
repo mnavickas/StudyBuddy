@@ -54,9 +54,12 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
         mGoogleApiClient.connect();
     }
 
-    private static LocationUpdater locationUpdater;
-    public static void subscribeServices(Context context){
-        locationUpdater = new LocationUpdater(context);
+    /**
+     * Initialize and start services
+     * @param context parent context
+     */
+    static void subscribeServices(Context context){
+        LocationUpdater locationUpdater = new LocationUpdater(context);
     }
 
     /**
@@ -66,6 +69,9 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
     public void onConnectionSuspended(int val)
     {}
 
+    /**
+     * Thread in which DB operations will be on
+     */
     private  ExecutorService mThreadPool = Executors.newSingleThreadExecutor();
 
     /**
@@ -83,6 +89,12 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
             });
         }
     }
+
+    /**
+     * post the location data to the database
+     * @param loc LocationWrapper object
+     * @return void
+     */
     private Void update(final LocationWrapper loc){
 
         String username = loc.user.username;

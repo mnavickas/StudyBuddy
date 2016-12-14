@@ -37,10 +37,13 @@ public class LoginActivity extends AppCompatActivity{
      */
     private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    /** UI references. */
     private AutoCompleteTextView mEmailView;
+    /** UI references. */
     private EditText mPasswordView;
+    /** UI references. */
     private View mProgressView;
+    /** UI references. */
     private View mLoginFormView;
 
     /**

@@ -14,11 +14,31 @@ import java.util.LinkedList;
 
 import make448greatagain.studybuddy.Messaging.MessagesListActivity;
 
+/**
+ * Activity to display the Contact list
+ */
 public class FriendsListActivity extends AppCompatActivity {
+    /**
+     * ListView that will contain the friends
+     */
     ListView listView;
+    /**
+     * Size of the list
+     */
     int listSize;
+    /**
+     * Array of friend names
+     */
     String[] friends;
+    /**
+     * This cast to context
+     */
     Context context;
+
+    /**
+     * On create, populate friends list
+     * @param savedInstanceState Bundle representing saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

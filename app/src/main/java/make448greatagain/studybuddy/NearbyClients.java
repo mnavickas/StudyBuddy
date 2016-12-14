@@ -28,6 +28,9 @@ class NearbyClients extends Thread {
     //Accept only data that is less than x Minutes old;
     private final int minutes = 100;
 
+    /**
+     * Mutex for location objects
+     */
     final Object timerMutex = new Object();
 
     /**
@@ -65,6 +68,10 @@ class NearbyClients extends Thread {
         locations = new LinkedList<>();
         expiredLocations = new LinkedList<>();
     }
+
+    /**
+     * Start services
+     */
     public static void subscribeServices(){
         getInstance().startThread();
     }
@@ -172,6 +179,12 @@ class NearbyClients extends Thread {
         }
     }
 
+    /**
+     *
+     * @param tempNorm temporary list of non-expired locations
+     * @param tempExp temporary list of expired locations
+     * @return true is a location has changed
+     */
     @SuppressWarnings("ConstantConditions")
     private boolean isChanged( LinkedList<LocationObject> tempNorm,
                                LinkedList<LocationObject> tempExp)

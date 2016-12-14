@@ -7,10 +7,13 @@ import make448greatagain.studybuddy.UserManager;
 
 /**
  * Created by Michael on 11/24/2016.
+ * App activity before user exists
  */
-
 public class AppPrefaceActivity extends AppCompatActivity {
-
+    /**
+     * On creation
+     * @param bundle saved bundle instance
+     */
     protected void onCreate(Bundle bundle){
         super.onCreate(bundle);
         UserManager.logout();

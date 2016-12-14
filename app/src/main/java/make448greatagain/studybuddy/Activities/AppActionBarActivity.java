@@ -13,16 +13,27 @@ import make448greatagain.studybuddy.UserManager;
 
 /**
  * Created by Michael on 11/23/2016.
- *
+ * Main ActionBar activity, featuring messaging and logout
  */
 public class AppActionBarActivity extends AppCompatActivity {
 
+    /**
+     * On creation
+     * @param menu Menu to inflate
+     * @return Success Status
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /**
+     * Handle item clicked
+     * @param item Menu Item that was pressed
+     * @return success status
+     */
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch(item.getItemId())

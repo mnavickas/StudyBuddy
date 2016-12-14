@@ -17,11 +17,21 @@ import make448greatagain.studybuddy.UserManager;
  */
 
 public class AppViewMessageActivity extends AppCompatActivity {
+    /**
+     * On creation
+     * @param menu Menu to inflate
+     * @return Success Status
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.view_msg_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+    /**
+     * Handle item clicked
+     * @param item Menu Item that was pressed
+     * @return success status
+     */
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch(item.getItemId())
