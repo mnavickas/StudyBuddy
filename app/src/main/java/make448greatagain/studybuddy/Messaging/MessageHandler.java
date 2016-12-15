@@ -40,7 +40,7 @@ public class MessageHandler{
     private static ExecutorService mThreadPool = Executors.newSingleThreadExecutor();
     private static ExecutorService mThreadPool2 = Executors.newSingleThreadExecutor();
     final static Object messagesMutex = new Object();
-    static LinkedList<MessageData> userMessages = new LinkedList<>();
+    public static LinkedList<MessageData> userMessages = new LinkedList<>();
 
 
     private static class MessageReceiver{
@@ -186,7 +186,6 @@ public class MessageHandler{
             public void run(){
                 while(running)
                 {
-                    Log.e(getClass().getSimpleName(),"RUNNING");
                     try{
                         send( messageQueue.take() );
                     }catch(InterruptedException e){

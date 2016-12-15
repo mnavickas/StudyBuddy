@@ -6,9 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import make448greatagain.studybuddy.Activities.AppPrefaceActivity;
+import make448greatagain.studybuddy.Activities.AppTestingActivity;
 
 
-public class MainActivity extends AppPrefaceActivity {
+public class MainActivity extends AppTestingActivity {
 
     /**
      * Create the activity

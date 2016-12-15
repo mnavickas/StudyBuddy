@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import static java.lang.Boolean.FALSE;
+import static make448greatagain.studybuddy.TestingSuite.DEBUG_TAG;
 
 /**
  * A login screen that offers login via username/password.
@@ -141,7 +143,7 @@ public class LoginActivity extends AppCompatActivity{
      * @param email string to check
      * @return if username is valid
      */
-    private boolean isEmailValid(String email) {
+    public boolean isEmailValid(String email) {
         boolean valid = email.length() > 4;
         if(email.matches(".*[,;:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
             valid = false;
@@ -153,7 +155,7 @@ public class LoginActivity extends AppCompatActivity{
      * @param password string to check
      * @return if password is valid
      */
-    private boolean isPasswordValid(String password) {
+    public boolean isPasswordValid(String password) {
         boolean valid = password.length() > 4;
         if(password.matches(".*[,;:{}|/<>.+~\'\\\\\"@#$%^&*()-].*")){
             valid = false;
@@ -208,12 +210,23 @@ public class LoginActivity extends AppCompatActivity{
         private final String mPassword;
         private final Context mContext;
         private final AppCompatActivity app;
+        private final boolean test;
+        Integer expectResult;
 
         UserLoginTask(String email, String password, Context context, AppCompatActivity app) {
             mEmail = email;
             mPassword = password;
             mContext= context;
             this.app = app;
+            test = false;
+        }
+        UserLoginTask(String email, String password, Integer expectResult ) {
+            mEmail = email;
+            mPassword = password;
+            mContext= null;
+            app = null;
+            this.test = true;
+            this.expectResult = expectResult;
         }
 
         @Override
@@ -251,6 +264,37 @@ public class LoginActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(final Integer success) {
             mAuthTask = null;
+
+            if(test){
+                if(expectResult == DBManager.SUCCESS)
+                {
+                    if(success.equals(expectResult)){
+                        Log.e(TestingSuite.DEBUG_TAG,"Login Page-Correct Login Info: Success");
+                    }
+                    else{
+                        Log.e(TestingSuite.DEBUG_TAG,"Login Page-Correct Login Info: Fail");
+                    }
+                }
+                else if(expectResult == DBManager.PASSWORD_ERROR)
+                {
+                    if(success.equals(expectResult)){
+                        Log.e(TestingSuite.DEBUG_TAG,"Login Page-Login Page-Wrong Password Login Info: Success");
+                    }
+                    else{
+                        Log.e(TestingSuite.DEBUG_TAG,"Login Page-Wrong Password Login Info: Fail");
+                    }
+                }
+                else if(expectResult == DBManager.USERNAME_ERROR)
+                {
+                    if(success.equals(expectResult)){
+                        Log.e(TestingSuite.DEBUG_TAG,"Login Page-Wrong Username Login Info: Success");
+                    }
+                    else{
+                        Log.e(TestingSuite.DEBUG_TAG,"Login Page-Wrong Username Login Info: Fail");
+                    }
+                }
+                return;
+            }
             showProgress(false);
 
             if (success == DBManager.SUCCESS){

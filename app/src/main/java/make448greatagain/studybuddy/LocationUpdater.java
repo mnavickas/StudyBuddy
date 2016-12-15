@@ -40,6 +40,13 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
      */
     private Context parentContext = null;
 
+
+    public static LocationUpdater instance;
+
+    public LocationUpdater(){
+
+    }
+
     /**
      * Create and start LocationUpdater
      * @param context Parent Context
@@ -52,6 +59,7 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
+        instance = this;
     }
 
     /**
@@ -74,11 +82,14 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
      */
     private  ExecutorService mThreadPool = Executors.newSingleThreadExecutor();
 
+    public static boolean test = false;
     /**
      * Upon Changing locations, store it in the DB
      * @param location New Location
      */
     public void onLocationChanged(final Location location){
+        if(test)
+            return;
         if(UserManager.getUser() != null) {
             UserManager.getUser().location = location;
             mThreadPool.execute(new Runnable() {
@@ -88,6 +99,14 @@ class LocationUpdater implements  GoogleApiClient.ConnectionCallbacks,
                 }
             });
         }
+    }
+    public void onLocationChanged(final LocationWrapper location){
+            mThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    update(location);
+                }
+            });
     }
 
     /**
